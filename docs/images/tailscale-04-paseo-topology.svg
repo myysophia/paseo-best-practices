@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 600" font-family="Helvetica Neue,Helvetica,Arial,PingFang SC,Microsoft YaHei,sans-serif">
+  <defs>
+    <marker id="aGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#16a34a"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#6b7280"/></marker>
+    <marker id="aOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#ea580c"/></marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.08"/></filter>
+  </defs>
+  <rect width="1040" height="600" fill="#ffffff"/>
+  <text x="520" y="34" text-anchor="middle" font-size="18" font-weight="600" fill="#111827">实战:paseo + Tailscale 双入口部署</text>
+  <text x="520" y="56" text-anchor="middle" font-size="11" fill="#6b7280">手机走 tailnet 加密直连(推荐);办公网段设备走公网 IP(明文,已在可信网段)</text>
+  <rect x="40" y="120" width="180" height="180" rx="14" fill="#dcfce7" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="130" y="150" text-anchor="middle" font-size="14" font-weight="600" fill="#14532d">手机 (Paseo app)</text>
+  <text x="130" y="170" text-anchor="middle" font-size="10" fill="#6b7280">--accept-dns=false</text>
+  <rect x="60" y="185" width="140" height="36" rx="6" fill="#ffffff" stroke="#bbf7d0"/>
+  <text x="130" y="200" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">tailnet IP</text>
+  <text x="130" y="214" text-anchor="middle" font-size="9" fill="#6b7280">100.&lt;phone&gt;.y.z</text>
+  <text x="130" y="240" text-anchor="middle" font-size="10" fill="#15803d">▸ WireGuard 加密</text>
+  <text x="130" y="256" text-anchor="middle" font-size="10" fill="#15803d">▸ 绕过 GFW 公网段</text>
+  <text x="130" y="272" text-anchor="middle" font-size="10" fill="#15803d">▸ DERP 兜底中继</text>
+  <rect x="280" y="180" width="220" height="60" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="390" y="202" text-anchor="middle" font-size="12" font-weight="600" fill="#15803d">WireGuard 加密隧道</text>
+  <text x="390" y="220" text-anchor="middle" font-size="10" fill="#6b7280">tailnet 虚拟网卡 · UDP 直连</text>
+  <text x="390" y="234" text-anchor="middle" font-size="9" fill="#15803d">失败时自动回落 DERP(HTTPS 443)</text>
+  <path d="M 220,210 L 280,210" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#aGreen)"/>
+  <path d="M 500,210 L 560,210" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#aGreen)"/>
+  <rect x="560" y="90" width="440" height="410" rx="10" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="580" y="116" font-size="13" font-weight="600" fill="#7c3aed">AWS 服务器(双角色)</text>
+  <text x="580" y="134" font-size="10" fill="#6b7280">Tailscale 节点 + paseo daemon 宿主 · systemd 托管</text>
+  <rect x="580" y="155" width="400" height="80" rx="8" fill="#ede9fe" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="780" y="180" text-anchor="middle" font-size="12" font-weight="600" fill="#5b21b6">Tailscale 客户端</text>
+  <text x="780" y="198" text-anchor="middle" font-size="10" fill="#6b7280">tailnet IP: 100.&lt;server&gt;.y.z · tailscale0</text>
+  <text x="780" y="214" text-anchor="middle" font-size="10" fill="#6b7280">--accept-dns=false(防断网)</text>
+  <rect x="630" y="260" width="300" height="90" rx="8" fill="#dbeafe" stroke="#60a5fa" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="780" y="286" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">paseo daemon</text>
+  <text x="780" y="305" text-anchor="middle" font-size="10" fill="#6b7280">listen: 0.0.0.0:8767(双入口)</text>
+  <text x="780" y="320" text-anchor="middle" font-size="10" fill="#6b7280">auth.password: bcrypt</text>
+  <text x="780" y="335" text-anchor="middle" font-size="10" fill="#6b7280">web-ui · systemd 托管</text>
+  <path d="M 780,235 L 780,260" stroke="#7c3aed" stroke-width="1.8" fill="none" marker-end="url(#aPurple)" stroke-dasharray="3,2"/>
+  <rect x="630" y="380" width="300" height="80" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="780" y="402" text-anchor="middle" font-size="11" font-weight="600" fill="#9a3412">入口 2:公网(办公网段)</text>
+  <text x="780" y="420" text-anchor="middle" font-size="10" fill="#6b7280">&lt;SERVER_IP&gt;:8767</text>
+  <text x="780" y="436" text-anchor="middle" font-size="9" fill="#9a3412">明文 · SG 仅放行办公 /30</text>
+  <text x="780" y="450" text-anchor="middle" font-size="9" fill="#9a3412">办公网段设备走这条(免 Tailscale)</text>
+  <rect x="40" y="380" width="200" height="80" rx="8" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="140" y="402" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">办公网段设备</text>
+  <text x="140" y="420" text-anchor="middle" font-size="10" fill="#6b7280">111.21.46.12/30</text>
+  <text x="140" y="436" text-anchor="middle" font-size="9" fill="#92400e">办公室电脑 / 测试机</text>
+  <text x="140" y="450" text-anchor="middle" font-size="9" fill="#92400e">免装 Tailscale</text>
+  <path d="M 240,420 C 420,440 460,425 630,415" stroke="#ea580c" stroke-width="1.8" fill="none" stroke-dasharray="6,4" marker-end="url(#aOrange)"/>
+  <rect x="380" y="408" width="120" height="14" fill="#ffffff" opacity="0.95"/>
+  <text x="440" y="419" text-anchor="middle" font-size="9" fill="#ea580c">公网 SG 放行 /30</text>
+  <g transform="translate(40, 510)">
+    <rect width="960" height="74" rx="6" fill="#fafafa" stroke="#e5e7eb"/>
+    <text x="14" y="22" font-size="11" font-weight="600" fill="#374151">两条入口怎么选:</text>
+    <circle cx="22" cy="44" r="4" fill="#16a34a"/><text x="32" y="48" font-size="10" fill="#374151">手机 / 跨网客户端 → tailnet 100.&lt;server&gt;.y.z:8767(WireGuard 加密,推荐)</text>
+    <circle cx="22" cy="64" r="4" fill="#ea580c"/><text x="32" y="68" font-size="10" fill="#374151">办公网段设备 → 公网 &lt;SERVER_IP&gt;:8767(明文,但已在可信办公网段;办公网段嗅探顾虑小)</text>
+  </g>
+</svg>
