@@ -10,6 +10,7 @@
 |---|---|---|
 | [**PASEO_LEARNING.md**](./PASEO_LEARNING.md) | **学习指南** —— 外部资源清单、学习路径、5 条原则、动手练习 | 想系统学习的人 |
 | [**PASEO_USAGE.md**](./PASEO_USAGE.md) | **使用手册** —— web UI / 手机配对 / 常用 CLI 命令 / 排查 | 使用者（手机/web UI 端） |
+| [**PASEO_SESSION_MIGRATION.md**](./PASEO_SESSION_MIGRATION.md) | **会话迁移最佳实践** —— 筛选并安全导入 Codex / Claude 历史会话 | 需要在手机端续聊的人 |
 | [**PASEO_OPS.md**](./PASEO_OPS.md) | **Linux 运维手册 + 踩坑记录** —— systemd 托管、端口/SG/密码、8 个踩坑、自检脚本 | 运维（改服务器配置前必读） |
 | [**PASEO_MACOS_DESKTOP.md**](./PASEO_MACOS_DESKTOP.md) | **macOS 桌面版运维手册** —— App/daemon 关系、进程结构、配置调优、端口冲突清理、开机自启 | Mac 用户、桌面版排查 |
 | [**PASEO_ARCHITECTURE.md**](./PASEO_ARCHITECTURE.md) | **原理与架构** —— 三层进程模型、连接拓扑、环境继承 | 想搞懂"为什么"的人 |
@@ -21,6 +22,7 @@
 
 - **「我想系统学习 Paseo，看哪些资料？」** → [LEARNING](./PASEO_LEARNING.md)
 - **「我想用手机/web 控制 agent」** → [USAGE](./PASEO_USAGE.md)
+- **「我想把 Codex / Claude 历史会话迁到 Paseo」** → [SESSION_MIGRATION](./PASEO_SESSION_MIGRATION.md)
 - **「我用的是 Mac 桌面 App，不是服务器」** → [MACOS_DESKTOP](./PASEO_MACOS_DESKTOP.md)
 - **「macOS 上 daemon 报 EADDRINUSE / 端口被占」** → [MACOS_DESKTOP 坑 #1](./PASEO_MACOS_DESKTOP.md)
 - **「手机连不上了」** → [USAGE §六](./PASEO_USAGE.md) 快速排查，深度排查 [OPS 坑 #7](./PASEO_OPS.md)

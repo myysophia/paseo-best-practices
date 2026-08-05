@@ -1,7 +1,7 @@
 # Paseo 使用手册
 
 > 面向**使用者**（手机端 / web UI 端用户）。怎么连、怎么发任务、怎么管 agent。
-> 运维和踩坑看 [`PASEO_OPS.md`](./PASEO_OPS.md)，原理看 [`PASEO_ARCHITECTURE.md`](./PASEO_ARCHITECTURE.md)。
+> 历史会话迁移看 [`PASEO_SESSION_MIGRATION.md`](./PASEO_SESSION_MIGRATION.md)，运维和踩坑看 [`PASEO_OPS.md`](./PASEO_OPS.md)，原理看 [`PASEO_ARCHITECTURE.md`](./PASEO_ARCHITECTURE.md)。
 
 ---
 
@@ -75,6 +75,8 @@ paseo status                    # 本地 daemon 状态（端口、PID、relay）
 paseo clone <github-repo>       # 克隆 repo 并注册为 paseo workspace
 paseo import <id>               # 把已有 provider session 导入为 paseo agent
 ```
+
+> `paseo import` 不等于可以批量导入。迁移历史 Codex / Claude 会话前，先阅读[会话迁移最佳实践](./PASEO_SESSION_MIGRATION.md)：先盘点和检查重复，再逐条导入并用 `paseo inspect` 验证。
 
 ---
 
