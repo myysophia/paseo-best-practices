@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 620" font-family="Helvetica Neue,Helvetica,Arial,PingFang SC,Microsoft YaHei,sans-serif">
+  <defs>
+    <marker id="aBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#2563eb"/></marker>
+    <marker id="aGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#16a34a"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#6b7280"/></marker>
+    <marker id="aPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#9333ea"/></marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.08"/></filter>
+  </defs>
+  <rect width="1040" height="620" fill="#ffffff"/>
+  <text x="520" y="34" text-anchor="middle" font-size="18" font-weight="600" fill="#111827">Tailscale 两层架构:控制平面(协调) vs 数据平面(WireGuard mesh)</text>
+  <rect x="30" y="60" width="420" height="500" rx="10" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="50" y="88" font-size="14" font-weight="600" fill="#7c3aed">控制平面 · Control Plane</text>
+  <text x="50" y="106" font-size="11" fill="#6b7280">只交换公钥和策略,几乎无流量;私钥不出本机</text>
+  <rect x="150" y="140" width="180" height="80" rx="8" fill="#ede9fe" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="168" text-anchor="middle" font-size="13" font-weight="600" fill="#5b21b6">协调服务器</text>
+  <text x="240" y="186" text-anchor="middle" font-size="11" fill="#6b7280">login.tailscale.com</text>
+  <text x="240" y="202" text-anchor="middle" font-size="10" fill="#6b7280">"公钥信箱" · 分发 ACL</text>
+  <rect x="60" y="260" width="140" height="64" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="130" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">身份提供商 (IdP)</text>
+  <text x="130" y="304" text-anchor="middle" font-size="10" fill="#6b7280">Google / Microsoft /</text>
+  <text x="130" y="316" text-anchor="middle" font-size="10" fill="#6b7280">GitHub / SSO + MFA</text>
+  <rect x="220" y="260" width="180" height="64" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="310" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#9a3412">ACL / Grants 策略</text>
+  <text x="310" y="304" text-anchor="middle" font-size="10" fill="#6b7280">最小权限 src→dst:port</text>
+  <text x="310" y="316" text-anchor="middle" font-size="10" fill="#6b7280">下发到每个节点本地执行</text>
+  <path d="M 150,260 L 200,225" stroke="#9333ea" stroke-width="1.5" fill="none" marker-end="url(#aPurple)"/>
+  <rect x="158" y="232" width="48" height="14" fill="#faf5ff" opacity="0.95"/>
+  <text x="182" y="243" text-anchor="middle" font-size="9" fill="#7c3aed">认证</text>
+  <path d="M 310,260 L 290,225" stroke="#9333ea" stroke-width="1.5" fill="none" marker-end="url(#aPurple)"/>
+  <rect x="280" y="232" width="58" height="14" fill="#faf5ff" opacity="0.95"/>
+  <text x="309" y="243" text-anchor="middle" font-size="9" fill="#7c3aed">下发策略</text>
+  <text x="240" y="364" text-anchor="middle" font-size="11" fill="#7c3aed" font-style="italic">↑↓ 公钥注册 / 策略同步(少流量)</text>
+  <rect x="560" y="60" width="450" height="500" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="580" y="88" font-size="14" font-weight="600" fill="#15803d">数据平面 · Data Plane</text>
+  <text x="580" y="106" font-size="11" fill="#6b7280">节点间 WireGuard 直接加密隧道,全 mesh,不经协调服务器</text>
+  <rect x="620" y="160" width="140" height="70" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="690" y="188" text-anchor="middle" font-size="13" font-weight="600" fill="#14532d">节点 A</text>
+  <text x="690" y="208" text-anchor="middle" font-size="10" fill="#6b7280">macOS · 100.x.y.z</text>
+  <rect x="840" y="160" width="140" height="70" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="910" y="188" text-anchor="middle" font-size="13" font-weight="600" fill="#14532d">节点 B</text>
+  <text x="910" y="208" text-anchor="middle" font-size="10" fill="#6b7280">Linux · 100.x.y.z</text>
+  <rect x="620" y="360" width="140" height="70" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="690" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#14532d">节点 C</text>
+  <text x="690" y="408" text-anchor="middle" font-size="10" fill="#6b7280">iOS · 100.x.y.z</text>
+  <rect x="840" y="360" width="140" height="70" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="910" y="388" text-anchor="middle" font-size="13" font-weight="600" fill="#14532d">节点 D</text>
+  <text x="910" y="408" text-anchor="middle" font-size="10" fill="#6b7280">AWS · 100.x.y.z</text>
+  <line x1="690" y1="195" x2="910" y2="195" stroke="#16a34a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="690" y1="195" x2="690" y2="395" stroke="#16a34a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="910" y1="195" x2="910" y2="395" stroke="#16a34a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="690" y1="395" x2="910" y2="395" stroke="#16a34a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="690" y1="195" x2="910" y2="395" stroke="#16a34a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="910" y1="195" x2="690" y2="395" stroke="#16a34a" stroke-width="1.5" opacity="0.55"/>
+  <text x="785" y="265" text-anchor="middle" font-size="11" fill="#15803d" font-weight="600">WireGuard 加密 mesh</text>
+  <text x="785" y="282" text-anchor="middle" font-size="10" fill="#6b7280">端到端加密,协调服务器也无法解密</text>
+  <path d="M 335,200 C 460,200 460,200 615,195" stroke="#9333ea" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#aPurple)"/>
+  <rect x="430" y="183" width="100" height="14" fill="#ffffff" opacity="0.95"/>
+  <text x="480" y="194" text-anchor="middle" font-size="9" fill="#7c3aed">公钥交换</text>
+  <g transform="translate(40, 575)">
+    <line x1="0" y1="8" x2="28" y2="8" stroke="#9333ea" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#aPurple)"/>
+    <text x="34" y="12" font-size="10" fill="#374151">控制平面(公钥/策略,少流量)</text>
+    <line x1="230" y1="8" x2="258" y2="8" stroke="#16a34a" stroke-width="1.5" marker-end="url(#aGreen)"/>
+    <text x="264" y="12" font-size="10" fill="#374151">数据平面(WireGuard 加密,业务流量)</text>
+  </g>
+</svg>

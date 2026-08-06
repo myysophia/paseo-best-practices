@@ -7,6 +7,8 @@
 > - [ADR-0002 用 EnvironmentFile 注入 IS_SANDBOX,而非写 .bashrc](#adr-0002-用-environmentfile-注入-is_sandbox)
 > - [ADR-0003 开放公网直连,而非只走 relay](#adr-0003-开放公网直连而非只走-relay)
 > - [ADR-0004 relay 保留启用,与直连并存](#adr-0004-relay-保留启用与直连并存)
+> - [ADR-0005 从公网明文直连切到 Tailscale 加密直连](#adr-0005-从公网明文直连切到-tailscale-加密直连)
+> - [ADR-0006 双入口并存：公网（办公网段）+ Tailscale tailnet](#adr-0006-双入口并存公网办公网段--tailscale-tailnet)
 
 ---
 
@@ -71,7 +73,7 @@ claude 以 root 跑,源码硬性拒绝 `root + --dangerously-skip-permissions`,�
 
 ## ADR-0003 开放公网直连,而非只走 relay
 
-- **状态:** Accepted
+- **状态:** ~~Accepted~~ → **Superseded by ADR-0005**（2026-08-03，因明文窃听风险切到 Tailscale）
 - **日期:** 2026-07-30
 
 **背景**
@@ -136,6 +138,89 @@ claude 以 root 跑,源码硬性拒绝 `root + --dangerously-skip-permissions`,�
 | 全开 `0.0.0.0/0` | 手机 IP 频繁变化、无法收窄 | **风险最高**:全网可探,完全依赖 daemon 密码兜底 |
 
 无论选哪种:**密码必须强、定期轮换**;paseo daemon 能以 root 起终端,任何认证绕过/RCE 漏洞都等于服务器 root。若长期不用,优先收窄或关闭入站。
+
+---
+
+## ADR-0005 从公网明文直连切到 Tailscale 加密直连
+
+- **状态:** ~~Accepted~~ → **Superseded by ADR-0006**（双入口并存）
+- **日期:** 2026-08-03
+- **取代:** ADR-0003 的公网直连部分（ADR-0003 标记为 Superseded by ADR-0005）
+
+**背景**
+ADR-0003 选了「开公网端口 + 密码」的直连。实测抓包验证（见 [DIRECT_CONNECT](./PASEO_DIRECT_CONNECT.md) §二）：`0.0.0.0` + 密码模式下，所有 API 流量（任务内容、shell 命令、工作目录、Authorization 头）在公网线缆上**全明文**。密码只防未授权访问，不防窃听。办公网段/同云用户都可被动嗅探。
+
+**选项**
+1. 保持 `0.0.0.0` + 密码（明文，有窃听风险）
+2. 在 daemon 前加 Caddy/Nginx 反代做 HTTPS（需域名 + 证书运维）
+3. **Tailscale：daemon 绑 tailnet IP，WireGuard 加密，不开公网端口**
+4. 纯 relay（放弃直连的低延迟）
+
+**决定**
+选 3。daemon 监听从 `0.0.0.0:8767` 改为 `<TS_IP>:8767`，两端 Tailscale 客户端都 `--accept-dns=false`（规避 MagicDNS 接管导致的断网问题，见下），撤销云防火墙公网 8767 入站规则。
+
+**理由**
+- 唯一能让「直连 + 加密 + 不开公网端口」三者兼得。
+- WireGuard 加密所有流量，消除嗅探风险。
+- daemon 不再暴露公网，攻击面归零（公网扫描扫不到）。
+- Tailscale DERP 兜底中继也能改善国内到海外的连通性。
+- 客户端断网问题（MagicDNS 接管系统 DNS）有确定修复：`tailscale set --accept-dns=false`。
+
+**代价 / 注意**
+- ⚠️ 依赖 Tailscale 基础设施。tailnet 挂了 = 直连断（relay 仍作兜底）。
+- ⚠️ 每台接入设备都要装 Tailscale + 加入同一 tailnet。新设备接入成本略增。
+- ⚠️ **Tailscale MagicDNS 会改系统 DNS 导致断网**（GitHub issues #14924/#10225/#16985）。**强制约束：所有节点 `tailscale set --accept-dns=false`**，或 admin console 关 MagicDNS / 不勾 Override local DNS。
+- ⚠️ `--accept-dns=false` 后失去 tailnet 自定义 DNS 短名，但用 `100.x.y.z` IP 直连不影响功能。
+
+**回滚**
+改回 `0.0.0.0:8767` + 重开云防火墙 8767 入站即可（旧配置已备份在 `~/.paseo/config.json.bak.*`）。
+
+---
+
+## ADR-0006 双入口并存：公网（办公网段）+ Tailscale tailnet
+
+- **状态:** Accepted
+- **日期:** 2026-08-03
+- **取代:** ADR-0005（ADR-0005 标记为 Superseded by ADR-0006）
+
+**背景**
+ADR-0005 把 daemon 绑死在 tailnet IP，公网完全关闭。但实际需求是：
+- 手机 / 跨网客户端要走 tailnet（加密、绕 GFW）。
+- 办公网段内的设备（如办公电脑）希望直接走公网 IP，不必每台都装 Tailscale。
+
+绑死 tailnet 后，办公网段设备无法访问。
+
+**选项**
+1. 只 tailnet（ADR-0005 的方案，办公网段要装 Tailscale 才能用）
+2. 只公网（ADR-0003 的方案，明文 + 跨网不安全）
+3. **双入口：`0.0.0.0:8767` 监听 + SG 分层放行 + 客户端按场景选入口**
+4. 反代 + HTTPS（需域名/证书运维）
+
+**决定**
+选 3。daemon 监听改回 `0.0.0.0:8767`（同时覆盖公网、tailnet、lo）；云防火墙只放行需要的来源：
+- bastion SG：撤销 `0.0.0.0/0`（全网开放）规则。
+- office-sg：保留办公网段 `/30` 全端口规则（办公网段设备走公网 IP）。
+- tailnet 流量不经云防火墙（走 Tailscale 虚拟网卡，daemon 在 `0.0.0.0` 也能接到）。
+
+客户端入口选择：
+- **手机 / 跨网客户端** → tailnet `<TS_IP>:8767`（WireGuard 加密，**推荐**）
+- **办公网段设备** → 公网 `<SERVER_IP>:8767`（明文，但已在可信办公网段内，可接受）
+
+**理由**
+- 兼顾「跨网加密」和「办公网段免 Tailscale」两个需求。
+- `0.0.0.0` 监听同时接到 tailnet 和公网流量，无需多实例。
+- SG 收窄后公网入口只在办公网段可达，攻击面比 ADR-0003 的全网开放小。
+- 手机走 tailnet 仍享受 WireGuard 加密 + DERP 兜底。
+
+**代价 / 注意**
+- ⚠️ 公网入口仍是明文 HTTP/WS。办公网段内可接受；若担心同网段嗅探，办公网段设备也可改装 Tailscale 走 tailnet。
+- ⚠️ 监听 `0.0.0.0` 意味着如果 SG 配错（误开 `0.0.0.0/0`），daemon 立刻全网暴露。**强约束：SG 规则改动后必须复核**（`aws ec2 describe-security-groups` 确认 8767 入站来源 CIDR）。
+- ⚠️ 客户端要清楚选哪个入口——配 host 时填错 IP（手机填了公网 IP）会走明文，失去加密。
+- ⚠️ daemon 能以 root 起终端，密码必须强、定期轮换。
+
+**回滚**
+- 想完全关公网：改回 `listen: "<TS_IP>:8767"` + `systemctl restart paseo`（SG 规则可留着不影响）。
+- 想完全开公网（不推荐）：bastion SG 重新加 `0.0.0.0/0`。
 
 ---
 
