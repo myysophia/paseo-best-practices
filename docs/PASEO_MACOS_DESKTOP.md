@@ -185,6 +185,31 @@ tail -5 ~/.paseo/daemon.log        # 应该看到 "Bootstrap complete"
 
 ---
 
+### 坑 #4 —— 运行中切 `auto` 报 `auto mode unavailable for this model`
+
+**现象**：在已运行的 Claude agent 上切 auto 模式，UI 报 `Cannot set permission mode to auto: auto mode unavailable for this model`，daemon.log 里能搜到完整 stack（搜 `set_agent_mode_request error`），错误源在 `@anthropic-ai/claude-agent-sdk` 的 `set_agent_mode` handler。
+
+**根因**：SDK 对 `auto` 权限模式有**模型白名单**，只放当前一代（`claude-sonnet-4-6` / `claude-opus-4-6`）。旧 agent 状态文件（`~/.paseo/agents/<workspace>/<agentId>.json`）固化的 `claude-sonnet-4`（老 ID）不在白名单里。**这不是 daemon bug，重启 daemon 无用，还会杀掉所有运行中的 agent。**
+
+**确认 agent 当前 model**：
+```bash
+python3 -c "
+import json
+d=json.load(open('$HOME/.paseo/agents/<workspace>/<agentId>.json'))
+print('provider=', d.get('provider'))
+print('config.model=', d.get('config',{}).get('model'))
+print('config.modeId=', d.get('config',{}).get('modeId'))
+"
+```
+
+**修复路径**（两层配合，详见 [ADR-0007](./PASEO_ADR.md)）：
+1. **中转层**：把你 Claude API 代理的 `claude-sonnet-4` alias 到 `claude-sonnet-4-6`。
+2. **Paseo 端**：用 `update_agent({ agentId, settings: { model: "claude-sonnet-4-6" } })` 改 agent model，再切 `auto`。新建 agent 用 `provider: "claude/sonnet"`，让 Paseo 自动解析到当前一代，不要硬写 model 字符串。
+
+**注意**：`auto` 模式不是 "allow all"。它用分类器判断每个 permission prompt，对 `/tmp` 写入这类边界操作仍会弹 request（实测）。要零打断用 `bypassPermissions`（风险自担）。
+
+---
+
 ## 六、开机自启配置（可选）
 
 桌面版默认**不会**开机自启。两种做法：
@@ -211,4 +236,5 @@ tail -5 ~/.paseo/daemon.log        # 应该看到 "Bootstrap complete"
 | 手机连不上（链路 vs 模型）排查 | [OPS 坑 #6](./PASEO_OPS.md) |
 | 改端口 / 开公网 / 设密码的安全顺序 | [OPS 坑 #4](./PASEO_OPS.md) |
 | `IS_SANDBOX=1` 的环境继承问题 | [OPS 坑 #1](./PASEO_OPS.md)（桌面版几乎不会遇到，因为不用 root） |
+| `auto` 模式模型白名单 / alias 方案 | [坑 #4](#坑-4--运行中切-auto-报-auto-mode-unavailable-for-this-model) + [ADR-0007](./PASEO_ADR.md) |
 | 语音 / 听写的 provider 配置 | https://paseo.sh/docs/configuration → Voice 段 |

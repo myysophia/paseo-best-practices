@@ -9,6 +9,7 @@
 > - [ADR-0004 relay 保留启用,与直连并存](#adr-0004-relay-保留启用与直连并存)
 > - [ADR-0005 从公网明文直连切到 Tailscale 加密直连](#adr-0005-从公网明文直连切到-tailscale-加密直连)
 > - [ADR-0006 双入口并存：公网（办公网段）+ Tailscale tailnet](#adr-0006-双入口并存公网办公网段--tailscale-tailnet)
+> - [ADR-0007 用模型 alias 让旧 model ID 通过 auto 模式校验](#adr-0007-用模型-alias-让旧-model-id-通过-auto-模式校验)
 
 ---
 
@@ -224,9 +225,56 @@ ADR-0005 把 daemon 绑死在 tailnet IP，公网完全关闭。但实际需求�
 
 ---
 
+## ADR-0007 用模型 alias 让旧 model ID 通过 auto 模式校验
+
+- **状态:** Accepted
+- **日期:** 2026-08-06
+
+**背景**
+Paseo 0.2.5 起的 Claude agent 支持 `auto` 权限模式（用模型分类器自动放行 permission prompt）。但 SDK 层（`@anthropic-ai/claude-agent-sdk`，路径在 App.asar 内）对 `auto` 模式有**模型白名单**：只有当前一代模型（如 `claude-sonnet-4-6`、`claude-opus-4-6`）能开。
+
+旧会话的 agent 状态文件（`~/.paseo/agents/<workspace>/<agentId>.json`）里固化了 `claude-sonnet-4`（老一代 ID）。运行中切 `auto` 会硬报错：
+
+```
+Cannot set permission mode to auto: auto mode unavailable for this model
+```
+
+错误从 SDK 的 `set_agent_mode` handler 抛出，Paseo 只把它透传。daemon.log 里搜 `set_agent_mode_request error` 能看到完整 stack。**这不是 daemon bug，重启 daemon 无用，还会杀掉所有运行中的 agent。**
+
+**选项**
+1. 等官方放白名单（被动，没法用）
+2. 删掉老 agent 重开（丢失上下文）
+3. 在中转层（自建 Claude API 代理）把 `claude-sonnet-4` alias 到 `claude-sonnet-4-6`，并让 Paseo 端把 agent model 改成 `claude-sonnet-4-6`
+4. 全程不用 `auto`，回退 `acceptEdits` / `default`（功能降级）
+
+**决定**
+选 3。两层配合：
+- **中转代理**：把旧 model ID 转发到当前一代模型（具体 alias 在你自己的中转层配置，不在 Paseo 这边动）。
+- **Paseo 端**：用 `update_agent` 把 agent 的 `settings.model` 改成 `claude-sonnet-4-6`，然后再切 `modeId: "auto"`。新建 agent 时直接用 `provider: "claude/sonnet"`（Paseo 会自动解析到当前一代），不要硬写 model 字符串。
+
+**理由**
+- 保留老 agent 的会话上下文（不用重建）。
+- 别人的 Claude API 客户端（非 Paseo）也能从 alias 受益，集中在中转层做一次即可。
+- SDK 白名单是硬约束，绕不过；alias 是把 SDK 看到的 model ID 改成白名单内 ID，根治。
+
+**代价 / 注意**
+- ⚠️ 中转层的 alias 是**全局**的，其他用到 `claude-sonnet-4` 字符串的客户端都会被改写。需要确认下游没有依赖旧 ID 做路由判断的逻辑。
+- ⚠️ `auto` 模式不是 "allow all"——它用分类器判断每个 permission prompt。对 `/tmp` 写入、跨工作区操作这类边界动作仍会弹 permission request（实测验证）。如果想要真正零打断，用 `bypassPermissions`（风险自担）。
+- ⚠️ SDK 白名单随版本演进。未来再发新一代（如 `claude-sonnet-5-x`）时，`claude-sonnet-4-6` 也会变旧，需要再调 alias。
+
+**验证**
+- 运行中切：`update_agent({ agentId, settings: { model: "claude-sonnet-4-6" } })` → `set_agent_mode({ agentId, modeId: "auto" })`，daemon.log 无 `set_agent_mode_request error`。
+- 新建：`create_agent({ provider: "claude/sonnet", settings: { modeId: "auto" }, ... })`，返回 `currentModeId: "auto"` 且无 permission 错误。
+
+**回滚**
+- 把 agent 的 `settings.model` 改回旧 ID + 切回 `acceptEdits` / `default`。
+- 中转层 alias 撤掉。
+
+---
+
 ## 决策变更流程
 
 改这些决定时:
-1. 在本文件追加新 ADR(如 ADR-0005),不要改旧的,旧的标 `Superseded by ADR-000X`。
+1. 在本文件追加新 ADR(如 ADR-0008),不要改旧的,旧的标 `Superseded by ADR-000X`。
 2. 同步更新 `PASEO_OPS.md` 的命令和 `PASEO_ARCHITECTURE.md` 的拓扑。
 3. 涉及 systemd 单元的改动,用验证命令确认生效(见 OPS 末尾自检脚本)。

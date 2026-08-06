@@ -29,6 +29,7 @@
 - **「添加主机选 Direct connect 怎么配 / 明文风险」** → [DIRECT_CONNECT](./PASEO_DIRECT_CONNECT.md)
 - **「我用的是 Mac 桌面 App，不是服务器」** → [MACOS_DESKTOP](./PASEO_MACOS_DESKTOP.md)
 - **「macOS 上 daemon 报 EADDRINUSE / 端口被占」** → [MACOS_DESKTOP 坑 #1](./PASEO_MACOS_DESKTOP.md)
+- **「运行中切 auto 模式报 `auto mode unavailable for this model`」** → [MACOS_DESKTOP 坑 #4](./PASEO_MACOS_DESKTOP.md) + [ADR-0007](./PASEO_ADR.md)
 - **「手机连不上了」** → [USAGE §六](./PASEO_USAGE.md) 快速排查，深度排查 [OPS 坑 #7](./PASEO_OPS.md)
 - **「我要改端口 / 开公网 / 改密码」** → [OPS §二](./PASEO_OPS.md) + [坑 #4](./PASEO_OPS.md)
 - **「手机报 root/sudo 拦截」** → [坑 #1 / #2 / #3](./PASEO_OPS.md)
