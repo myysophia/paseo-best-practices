@@ -9,7 +9,7 @@
 | 文档 | 定位 | 给谁看 |
 |---|---|---|
 | [**PASEO_LEARNING.md**](./PASEO_LEARNING.md) | **学习指南** —— 外部资源清单、学习路径、5 条原则、动手练习 | 想系统学习的人 |
-| [**TAILSCALE_GUIDE.md**](./TAILSCALE_GUIDE.md) | **Tailscale 科普指南** —— 原理(两层架构/NAT 穿透/DERP)、subnet router/exit node、最佳实践、收费、paseo 实战案例 | 想搞懂 Tailscale 的人 |
+| [**TAILSCALE_GUIDE.md**](./TAILSCALE_GUIDE.md) | **Tailscale 科普指南** —— 两层架构、NAT 穿透与 DERP/直连决策机制(§四,含 netcheck/status 实战)、subnet router/exit node、最佳实践、收费、paseo 实战案例 | 想搞懂 Tailscale 的人,尤其"为什么我走 DERP 不走直连"的新手 |
 | [**PASEO_USAGE.md**](./PASEO_USAGE.md) | **使用手册** —— web UI / 手机配对 / 常用 CLI 命令 / 排查 | 使用者（手机/web UI 端） |
 | [**PASEO_SESSION_MIGRATION.md**](./PASEO_SESSION_MIGRATION.md) | **会话迁移最佳实践** —— 筛选并安全导入 Codex / Claude 历史会话 | 需要在手机端续聊的人 |
 | [**PASEO_DIRECT_CONNECT.md**](./PASEO_DIRECT_CONNECT.md) | **直连最佳实践** —— 抓包验证明文风险、三层防御、加密方案对比、决策清单 | 加 host 选直连前必读 |
@@ -26,6 +26,7 @@
 - **「我想用手机/web 控制 agent」** → [USAGE](./PASEO_USAGE.md)
 - **「我想把 Codex / Claude 历史会话迁到 Paseo」** → [SESSION_MIGRATION](./PASEO_SESSION_MIGRATION.md)
 - **「Tailscale 是什么 / 怎么工作 / 怎么用」** → [TAILSCALE_GUIDE](./TAILSCALE_GUIDE.md)
+- **「为什么我 Tailscale 走 DERP 不走直连 / 怎么判断当前路径」** → [TAILSCALE_GUIDE §四](./TAILSCALE_GUIDE.md)
 - **「添加主机选 Direct connect 怎么配 / 明文风险」** → [DIRECT_CONNECT](./PASEO_DIRECT_CONNECT.md)
 - **「我用的是 Mac 桌面 App，不是服务器」** → [MACOS_DESKTOP](./PASEO_MACOS_DESKTOP.md)
 - **「macOS 上 daemon 报 EADDRINUSE / 端口被占」** → [MACOS_DESKTOP 坑 #1](./PASEO_MACOS_DESKTOP.md)

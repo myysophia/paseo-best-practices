@@ -62,30 +62,131 @@ Tailscale 把网络分成两层:
 
 ---
 
-## 四、NAT 穿透与 DERP fallback
+## 四、NAT 穿透与 DERP fallback(直连 vs 中继的完整决策机制)
 
-这是 Tailscale 最"魔法"的部分:**两台都在 NAT 后面的设备,不开任何端口,怎么直接连上?**
+这是 Tailscale 最"魔法"的部分:**两台都在 NAT 后面的设备,不开任何端口,怎么直接连上?更关键的是——什么时候能直连,什么时候被迫走中继?**
 
 ![NAT 穿透与 DERP fallback](./images/tailscale-02-nat-derp.png)
 
-### 直连 P2P(优先,成功率 >90%)
+### 4.1 两种连接方式是什么
 
-用 STUN/ICE 协议发现对方的公网地址和端口,双方**同时**向对方发包"打洞"——NAT 看到出站包后,会允许对应的入站包通过。Tailscale 的内部数据显示典型场景成功率 >90%。
+| | 直连(Direct / P2P) | DERP 中继(Relay) |
+|---|---|---|
+| **物理路径** | 设备 A ──( WireGuard UDP )── 设备 B | 设备 A ──> DERP 服务器 ──> 设备 B |
+| **协议/端口** | UDP,源/目标端口由 NAT 打洞决定 | HTTPS(TCP/443),伪装成普通网页流量 |
+| **延迟/带宽** | 最低(两点间直通,通常跑满带宽) | 高(多一跳,且 DERP 节点有上限) |
+| **加密** | WireGuard 端到端加密 | **同样是 WireGuard 端到端加密**——DERP 只是转发加密字节流,自己无法解密 |
+| **安全性** | 无差异——DERP 不降安全,只降性能 | 同上 |
 
-能不能打通取决于 NAT 类型:
+**关键澄清**:DERP **不是降级加密**,只是降级性能。即使全走 DERP,Tailscale 仍然是端到端加密的;DERP 服务器(无论官方的还是自建的)看到的只是一坨密文字节流。
 
-- **软 NAT**(锥形 NAT):同一内部源端口对所有目标保持一致,STUN 能发现,可打洞 → 直连成功。
-- **硬 NAT**(对称式 NAT):每个目标分配不同源端口,双方猜不到对方端口 → 打洞失败。
+### 4.2 决策算法:Tailscale 怎么决定走哪条
 
-### DERP fallback(失败时兜底)
+**心智模型先纠偏**:不是"先试直连,失败再切 DERP"的串行逻辑,而是**并行维持两条路径,实时挑当前最优的**。
 
-当 UDP 被完全封禁(如酒店/公司防火墙禁 UDP)或硬 NAT 打洞失败,Tailscale 自动回落到 **DERP**(Designated Encrypted Relay for Packets):
+实际流程:
 
-- 用 HTTPS(443 端口)流承载 WireGuard 加密包——能穿透绝大多数防火墙。
-- **DERP 服务器无法解密**:它收到的是已经用 WireGuard 加密的字节流,只是盲目转发。
-- 全球分布的 DERP 节点,自动选离两端最近的。
+1. **双方都连上 DERP**(永远在先)
+   - 节点启动时,立刻和最近的 DERP 服务器建一条 HTTPS 长连接(控制流量,极小)。
+   - 这条 DERP 连接**全程不断**,即使你后来成功直连了,DERP 连接也保留作为兜底和控制信道。
 
-**结论**:无论网络多恶劣,Tailscale 保证连通——要么直连(快),要么 DERP(慢一点但一定通),且两种情况下流量都是端到端加密的。
+2. **通过协调服务器交换"网络位置"**
+   - 每个节点把自己的公网 IP、NAT 映射后的源端口等信息,通过 DERP 互相告知(这是 disco 协议)。
+   - 协调服务器(login.tailscale.com)只帮传递公钥和网络位置,不参与数据。
+
+3. **双方尝试 UDP 打洞**(并行)
+   - 双方各自向对方的"推测公网地址:端口"发 UDP 包(叫"打洞")。
+   - NAT 看到自己这边主动发出了包,就会允许对方的回包进入——洞就开了。
+   - 用到 STUN/UPnP/PMP/PCP 等多种协议协助发现 NAT 后的真实地址。
+
+4. **打洞结果决定最终路径**
+   - **打洞成功**:Upgrade 到直连 UDP,DERP 退居二线(只保留长连接做控制信道,业务流量不再走它)。
+   - **打洞失败**(硬 NAT / UDP 被防火墙封禁):业务流量继续走 DERP。
+   - **直连质量恶化**(丢包/中断):自动 fallback 回 DERP,无需重连。
+
+5. **运行中持续重新评估**
+   - 网络环境变化(切换 WiFi、移动到新网段)时,Tailscale 会重新尝试打洞,可能从 DERP 升级到直连,反之亦然。
+   - 你看到的"直连"或"DERP"是**当前瞬时状态**,不是钉死的。
+
+### 4.3 决定成败的关键:NAT 类型
+
+打洞能不能成功,完全取决于**两边 NAT 设备的行为**。Tailscale 把 NAT 分成两类:
+
+- **软 NAT**(锥形 / Cone NAT):同一内部源端口,对所有目标都保持一致映射。STUN 能直接探测出"我对外长什么样",双方互相告知后就能打洞 → **可直连**。
+- **硬 NAT**(对称式 / Symmetric NAT):每个不同目标都分配一个**新的随机源端口**,对方根本猜不到你下一个端口是多少 → **打洞必败**。
+
+经验法则:**只要两边有一边是硬 NAT,就只能走 DERP**。两边都是软 NAT,几乎一定能直连。
+
+> 本机 NAT 类型可以用 `tailscale netcheck` 看,关键字段是 `MappingVariesByDestIP`:
+> - `false` = 软 NAT(锥形),打洞有戏
+> - `true` = 硬 NAT(对称),本节点会拖累所有对端走 DERP
+
+### 4.4 实战:如何判断我现在走的是直连还是 DERP
+
+**命令 1:`tailscale status`**(最常用)
+
+```bash
+$ tailscale status
+100.96.58.54     macbook-pro      john.mr.wx@  macOS  -
+100.125.82.93    agen2b           john.mr.wx@  linux  active; relay "hkg", tx 56532 rx 823804
+100.109.195.126  ip-10-20-16-133  john.mr.wx@  linux  active; direct 13.236.113.51:41641, tx 37724 rx 67152
+100.66.245.85    iphone181        john.mr.wx@  iOS    active; relay "tok", tx 269756 rx 32644
+```
+
+看每行末尾的状态字段:
+
+- `direct <IP>:<port>` —— **直连成功**,后面跟对方真实公网地址
+- `relay "<DERP代号>"` —— **正在走 DERP**,"hkg"=Hong Kong / "tok"=Tokyo,是 DERP 节点位置
+- 空(`-` / `idle`)—— 当前没有活跃流量(空闲时不显示)
+
+**命令 2:`tailscale ping <对端>`**(强制探测当前路径)
+
+```bash
+$ tailscale ping agen2b
+pong from agen2b (100.125.82.93) via DERP(hkg) in 65ms
+pong from agen2b (100.125.82.93) via DERP(hkg) in 64ms
+```
+
+输出会明确告诉你 `via DERP(hkg)` 还是 `direct`。它会**多次探测**,期间会尝试打洞升级,你能看到从 DERP 切换到 direct 的过程(如果打洞成功)。
+
+**命令 3:`tailscale netcheck`**(看本机网络环境)
+
+```bash
+$ tailscale netcheck
+Report:
+	* UDP: true                          # UDP 可用(若 false,基本告别直连)
+	* IPv4: yes, 120.192.215.66:11014
+	* MappingVariesByDestIP: true        # ⚠️ true 表示本机是对称 NAT,会拖累对端走 DERP
+	* CaptivePortal: false
+	* Nearest DERP: Hong Kong
+	* DERP latency:
+		- hkg: 65.1ms  (Hong Kong)       # 就近 DERP 节点延迟
+		- tok: 85.7ms  (Tokyo)
+		- ...
+```
+
+`MappingVariesByDestIP: true` 是判断"我这边为什么连不上直连"最直接的指标——true 说明本机 NAT 是对称的,大概率你和任何人都是 DERP。
+
+### 4.5 如何影响决策(强制 / 优化)
+
+| 想做的事 | 方法 |
+|---|---|
+| **强制只走 DERP**(调试/特殊场景) | `tailscale up --netfilter-mode=off` 之外的官方做法是 `tailscale debug via <node>`;一般用户不强制。更常见的诉求反而是:为什么我走 DERP? |
+| **提高直连成功率** | 路由器开 UPnP / NAT-PMP;家用路由器把 Tailscale 设备设为 DMZ;更换对称 NAT 严重的运营商 |
+| **自建 DERP**(降延迟/数据主权) | 见 [官方自建 DERP 文档](https://tailscale.com/kb/1118/custom-derp-servers)。paseo 跨境场景常用:在大陆节点自建 DERP,避免官方 DERP 全在境外 |
+| **看实时打洞日志** | `tailscale debug disco <node>` 或 `journalctl -u tailscaled -f` 看 `magicsock` 日志 |
+
+### 4.6 为什么 Tailscale 设计成"DERP 永远在线"
+
+新手常问:既然 DERP 慢,为什么不"直连成功就关掉 DERP"?
+
+三个原因:
+
+1. **DERP 是控制信道的载体**——节点间交换 disco 信息(端口、NAT 类型)走 DERP,因为它一定通。如果 DERP 关了,直连断了之后没东西帮你重新协调。
+2. **DERP 是无缝 fallback**——直连链路突然恶化(无线切换、运营商抖动)时,业务流量无感切到 DERP,体验是"卡一下"而不是"断线重连"。
+3. **DERP 是硬 NAT 场景的唯一通路**——企业网络、酒店 WiFi、运营商级 NAT(CGNAT)经常是无法直连的,DERP 保证"无论如何都能用"。
+
+> **一句话总结**:DERP 同时承担"控制信道 + 兜底数据信道"两个角色,这就是为什么它永远不断开——即使你看到状态是 `direct`,后台那条 DERP 连接仍然活着,只是不跑业务流量。
 
 ---
 
