@@ -156,6 +156,49 @@ paseo.your-domain.com {
 - `daemon.hostnames` 加 `paseo.your-domain.com`。
 - 云防火墙只开 443,不开 8767。
 
+### 浏览器 WebUI 常见坑:TCP 已通但仍显示 `Transport closed (1006)`
+
+从 Agentgo/Paseo WebUI 添加 Tailscale 地址时,页面所在的来源(origin)和要连接的 daemon 地址是两回事:
+
+- **连接地址**是表单里填写的 `100.x.y.z:6767`。
+- **浏览器来源**是打开 WebUI 的地址,例如 `http://124.174.69.46:8767`。
+
+即使 Tailscale 已连通、daemon 已监听 `0.0.0.0:6767`,如果 `daemon.cors.allowedOrigins` 没有包含 WebUI 的**完整来源**(协议、主机和端口),daemon 仍会在 WebSocket 握手阶段拒绝连接。前端通常只显示泛化错误:
+
+```text
+Transport closed (code 1006)
+```
+
+排查 daemon 日志时,如果看到下面的记录,说明网络已经到达 daemon,根因是 CORS,不是 Tailscale 路由或端口:
+
+```text
+Rejected connection from origin
+origin: http://124.174.69.46:8767
+remoteAddress: 100.96.58.54
+```
+
+配置应加入实际打开 WebUI 的来源,而不是只加入 Tailscale IP:
+
+```json
+{
+  "daemon": {
+    "cors": {
+      "allowedOrigins": [
+        "https://app.paseo.sh",
+        "http://124.174.69.46:8767"
+      ]
+    }
+  }
+}
+```
+
+注意:
+
+- `http` 和 `https` 是两个不同来源,必须按实际页面协议填写。
+- 端口也属于来源的一部分,不能省略；不要在末尾添加 `/`。
+- 修改配置后需让 Paseo daemon/Helper 重新加载配置,再分别验证 WebUI 直连和原有 relay。
+- 若通过 HTTPS 域名访问 WebUI,应加入对应的 `https://域名`,并优先使用 HTTPS 反向代理。
+
 ### 方案 C:纯 relay(放弃直连)
 
 最省事:不开公网端口,daemon 只出站连 relay,手机也连 relay。代价是多一跳海外 relay,国内链路可能抖。如果直连的主要目的是降延迟,这个方案等于放弃直连;如果直连的主要目的是"避免依赖海外 relay",选 A 或 B。
