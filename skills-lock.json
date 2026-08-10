@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "skills": {
+    "paseo": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": "skills/paseo/SKILL.md",
+      "computedHash": "bc78ac82de5c18d1ba4e1d7520ac357e4bd9f1aaf893fceb0872d971c6253161"
+    },
+    "paseo-advisor": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": "skills/paseo-advisor/SKILL.md",
+      "computedHash": "4719d6aa3707fd259100e8a41ed4d42221da7c0563afa945e1c1adbb77492852"
+    },
+    "paseo-committee": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": "skills/paseo-committee/SKILL.md",
+      "computedHash": "552f263890e3164494d6c956e87a2f368a8c0ecf939263ff4bbff5590c753f76"
+    },
+    "paseo-handoff": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": "skills/paseo-handoff/SKILL.md",
+      "computedHash": "349e9ac36c85245e87cb5c1f98b1eb25c8efbbd79ffd6982d09407a4e915f1a5"
+    },
+    "paseo-loop": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": "skills/paseo-loop/SKILL.md",
+      "computedHash": "555df169e988901cb195ba8f9528a9dcafa1ad6c90a229dd2db79649b1e5ef88"
+    },
+    "release-beta": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/release-beta/SKILL.md",
+      "computedHash": "6d1a0a5e6577723451ad1b4f7ce8d1f8ffa99f6abe418a61a7c15b5cf618c2a0"
+    },
+    "release-stable": {
+      "source": "getpaseo/paseo",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/release-stable/SKILL.md",
+      "computedHash": "ab0d1567469bc2fe8d4a2550d5e5e7074a6732d371241bed8cc961386e4e3911"
+    }
+  }
+}

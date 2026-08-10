@@ -16,6 +16,7 @@ Paseo 让你从手机驱动服务器上的 AI coding agent（claude / codex 等�
 | [docs/PASEO_OPS.md](./docs/PASEO_OPS.md) | Linux 运维手册 + 踩坑记录：systemd 托管、端口/密码/公网、自检脚本 |
 | [docs/PASEO_MACOS_DESKTOP.md](./docs/PASEO_MACOS_DESKTOP.md) | macOS 桌面版运维：App/daemon 关系、配置调优、端口冲突清理 |
 | [docs/PASEO_ADR.md](./docs/PASEO_ADR.md) | 决策记录（ADR）：不可逆决策的背景 / 选项 / 代价 |
+| [docs/PASEO_SKILLS.md](./docs/PASEO_SKILLS.md) | Orchestration skills：安装状态、验证结果与最佳实践 |
 
 ## 推荐阅读顺序
 
