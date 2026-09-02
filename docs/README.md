@@ -16,6 +16,7 @@
 | [**PASEO_OPS.md**](./PASEO_OPS.md) | **Linux 运维手册 + 踩坑记录** —— systemd 托管、端口/SG/密码、8 个踩坑、自检脚本 | 运维（改服务器配置前必读） |
 | [**PASEO_MACOS_DESKTOP.md**](./PASEO_MACOS_DESKTOP.md) | **macOS 桌面版运维手册** —— App/daemon 关系、进程结构、配置调优、端口冲突清理、开机自启 | Mac 用户、桌面版排查 |
 | [**PASEO_ARCHITECTURE.md**](./PASEO_ARCHITECTURE.md) | **原理与架构** —— 三层进程模型、连接拓扑、环境继承 | 想搞懂"为什么"的人 |
+| [**PASEO_PI_CUSTOM_MODEL.md**](./PASEO_PI_CUSTOM_MODEL.md) | **Pi 自定义模型配置** —— 中转站接入多厂商模型、models.json 字段详解、SOP、5 个坑 | 用 Pi provider + 中转/自定义模型的人 |
 | [**PASEO_ADR.md**](./PASEO_ADR.md) | **决策记录(ADR)** —— 不可逆决策的背景/选项/代价 | 改架构决策前先读对应 ADR |
 | [**PASEO_SKILLS.md**](./PASEO_SKILLS.md) | **Orchestration skills 安装与最佳实践** —— 安装状态、验证、handoff/loop/committee/advisor 使用规范 | 使用 Paseo 编排能力的人 |
 
@@ -37,6 +38,7 @@
 - **「手机报 root/sudo 拦截」** → [坑 #1 / #2 / #3](./PASEO_OPS.md)
 - **「paseo 到底怎么把手机请求送到 claude 的」** → [ARCHITECTURE](./PASEO_ARCHITECTURE.md)
 - **「当初为什么用 systemd / 为什么开公网」** → [ADR](./PASEO_ADR.md)
+- **「Pi 想接中转站模型 / 模型全连不上」** → [PI_CUSTOM_MODEL](./PASEO_PI_CUSTOM_MODEL.md)（域名失效先看坑 #1）
 - **「怎么安装/安全使用 Paseo skills」** → [SKILLS](./PASEO_SKILLS.md)
 
 ---
