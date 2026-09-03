@@ -33,6 +33,7 @@ tail -f ~/.paseo/daemon.log   # 更细的文件日志
 - `/etc/systemd/system/paseo.service` —— systemd 单元(前台 `--foreground` 跑)
 - `~/.paseo/paseo.env` —— **环境变量注入文件(600)**,内容:
   - `IS_SANDBOX=1` ← 命根子,详见坑 #1
+  - `NODE_OPTIONS=--no-network-family-autoselection` ← Node 22 Relay 连接修复,详见坑 #8
   - `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN` / 各默认模型
 - `~/.paseo/config.json` —— paseo 配置:`listen` 端口、`relay.enabled`、`auth.password` 等
 - `~/.claude/settings.json` —— claude 自己读的 env 块(凭据 + 模型映射)
@@ -137,6 +138,40 @@ IS_SANDBOX=1 paseo daemon start  # 或交给 systemd(推荐)
 
 ### 坑 #7 —— 国内手机连不稳的客观现实
 relay 链路是 `国内手机 → (GFW+太平洋) → relay(海外) → 服务器`。改直连后变成 `手机 → (GFW+太平洋) → 服务器`,省掉中间那一跳,但 **GFW 那段还在**,国内移动数据下仍会抖,这是地理决定的,不是配置问题。直连地址:在手机 Direct connect tab 填 `<服务器公网IP>:<端口>`。
+
+### 坑 #8 —— Node 22 的网络地址族自动选择导致 Relay 假离线
+**现象:** Paseo daemon 和 `http://127.0.0.1:8767/api/health` 都正常,直连客户端也可能能访问,但手机端显示离线;日志每隔约 30 秒重复:
+
+```text
+relay_error: connect ETIMEDOUT <relay IPv4>:443
+relay_error: connect ENETUNREACH <relay IPv6>:443
+relay_control_disconnected
+```
+
+**根因:** Node.js 22 的 network family autoselection 同时尝试 IPv4/IPv6。服务器有 IPv4 出口但没有可用 IPv6 路由时, Paseo 的 Relay WebSocket 连接会反复失败。`curl`/浏览器访问同一 Relay 地址成功,不能证明 Paseo 使用的 Node WebSocket 链路正常。
+
+**正确解法:** 在 systemd 读取的环境文件 `~/.paseo/paseo.env` 中持久加入:
+
+```text
+NODE_OPTIONS=--no-network-family-autoselection
+```
+
+然后应用并重启:
+
+```bash
+systemctl daemon-reload
+systemctl restart paseo
+```
+
+**验证:**
+
+```bash
+DPID=$(systemctl show -p MainPID --value paseo)
+tr '\0' '\n' < /proc/$DPID/environ | grep '^NODE_OPTIONS='
+journalctl -u paseo -n 100 --no-pager | grep -E 'relay_control_connected|relay_error'
+```
+
+看到 `NODE_OPTIONS=--no-network-family-autoselection` 和 `relay_control_connected` 即表示修复生效。该修复已在本机 Paseo `0.7.2`、Node `22.12.0` 上验证。
 
 ---
 

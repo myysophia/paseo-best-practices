@@ -33,7 +33,7 @@
 - **「我用的是 Mac 桌面 App，不是服务器」** → [MACOS_DESKTOP](./PASEO_MACOS_DESKTOP.md)
 - **「macOS 上 daemon 报 EADDRINUSE / 端口被占」** → [MACOS_DESKTOP 坑 #1](./PASEO_MACOS_DESKTOP.md)
 - **「运行中切 auto 模式报 `auto mode unavailable for this model`」** → [MACOS_DESKTOP 坑 #4](./PASEO_MACOS_DESKTOP.md) + [ADR-0007](./PASEO_ADR.md)
-- **「手机连不上了」** → [USAGE §六](./PASEO_USAGE.md) 快速排查，深度排查 [OPS 坑 #7](./PASEO_OPS.md)
+- **「手机连不上了」** → [USAGE §六](./PASEO_USAGE.md) 快速排查，深度排查 [OPS 坑 #7 / #8](./PASEO_OPS.md)
 - **「我要改端口 / 开公网 / 改密码」** → [OPS §二](./PASEO_OPS.md) + [坑 #4](./PASEO_OPS.md)
 - **「手机报 root/sudo 拦截」** → [坑 #1 / #2 / #3](./PASEO_OPS.md)
 - **「paseo 到底怎么把手机请求送到 claude 的」** → [ARCHITECTURE](./PASEO_ARCHITECTURE.md)
@@ -66,7 +66,7 @@
 | 密码 | 已设 (`config.json: auth.password`) |
 | 中继 | 启用 (`relay.paseo.sh:443`)，作兜底 |
 | Tailscale DNS 接管 | **两端都关**（`--accept-dns=false`，防断网） |
-| 版本 | paseo 0.2.4 |
+| 版本 | paseo 0.7.2 |
 
 > **两条入口怎么选**：手机/跨网客户端优先走 tailnet（加密）；办公网段内的设备走公网 IP（明文，但已在可信网段）。详见 [ADR-0005](./PASEO_ADR.md) 和 [DIRECT_CONNECT](./PASEO_DIRECT_CONNECT.md)。
 >
