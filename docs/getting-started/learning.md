@@ -1,7 +1,7 @@
 # Paseo 学习指南
 
 > 面向**想系统学习 Paseo 的人**。把分散在官方文档、HN、Reddit、社区的内容整理成一条清晰的路径，并提炼可复用的原则。
-> 部署运维看 [`PASEO_OPS.md`](./PASEO_OPS.md)（Linux）或 [`PASEO_MACOS_DESKTOP.md`](./PASEO_MACOS_DESKTOP.md)（Mac 桌面），使用手册看 [`PASEO_USAGE.md`](./PASEO_USAGE.md)。
+> 部署运维看 [`linux-ops.md`](../ops/linux-ops.md)（Linux）或 [`macos-desktop.md`](../ops/macos-desktop.md)（Mac 桌面），使用手册看 [`usage.md`](../getting-started/usage.md)。
 
 ---
 
@@ -171,9 +171,9 @@ Paseo 还在快速迭代，几个值得关注的方向：
 
 | 如果你在找…… | 去看 |
 |---|---|
-| 怎么部署到 Linux 服务器 | [`PASEO_OPS.md`](./PASEO_OPS.md) |
-| macOS 桌面版怎么用 | [`PASEO_MACOS_DESKTOP.md`](./PASEO_MACOS_DESKTOP.md) |
-| 手机/web 怎么连、怎么用 | [`PASEO_USAGE.md`](./PASEO_USAGE.md) |
-| daemon/client 三层架构原理 | [`PASEO_ARCHITECTURE.md`](./PASEO_ARCHITECTURE.md) |
-| 不可逆决策的背景 | [`PASEO_ADR.md`](./PASEO_ADR.md) |
+| 怎么部署到 Linux 服务器 | [`linux-ops.md`](../ops/linux-ops.md) |
+| macOS 桌面版怎么用 | [`macos-desktop.md`](../ops/macos-desktop.md) |
+| 手机/web 怎么连、怎么用 | [`usage.md`](../getting-started/usage.md) |
+| daemon/client 三层架构原理 | [`architecture.md`](../internals/architecture.md) |
+| 不可逆决策的背景 | [`adr.md`](../adr/adr.md) |
 | **系统学习路径 + 外部资源** | **本文** |

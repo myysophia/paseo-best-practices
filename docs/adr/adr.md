@@ -149,7 +149,7 @@ claude 以 root 跑,源码硬性拒绝 `root + --dangerously-skip-permissions`,�
 - **取代:** ADR-0003 的公网直连部分（ADR-0003 标记为 Superseded by ADR-0005）
 
 **背景**
-ADR-0003 选了「开公网端口 + 密码」的直连。实测抓包验证（见 [DIRECT_CONNECT](./PASEO_DIRECT_CONNECT.md) §二）：`0.0.0.0` + 密码模式下，所有 API 流量（任务内容、shell 命令、工作目录、Authorization 头）在公网线缆上**全明文**。密码只防未授权访问，不防窃听。办公网段/同云用户都可被动嗅探。
+ADR-0003 选了「开公网端口 + 密码」的直连。实测抓包验证（见 [DIRECT_CONNECT](../guides/direct-connect.md) §二）：`0.0.0.0` + 密码模式下，所有 API 流量（任务内容、shell 命令、工作目录、Authorization 头）在公网线缆上**全明文**。密码只防未授权访问，不防窃听。办公网段/同云用户都可被动嗅探。
 
 **选项**
 1. 保持 `0.0.0.0` + 密码（明文，有窃听风险）
@@ -276,5 +276,5 @@ Cannot set permission mode to auto: auto mode unavailable for this model
 
 改这些决定时:
 1. 在本文件追加新 ADR(如 ADR-0008),不要改旧的,旧的标 `Superseded by ADR-000X`。
-2. 同步更新 `PASEO_OPS.md` 的命令和 `PASEO_ARCHITECTURE.md` 的拓扑。
+2. 同步更新 `linux-ops.md` 的命令和 `architecture.md` 的拓扑。
 3. 涉及 systemd 单元的改动,用验证命令确认生效(见 OPS 末尾自检脚本)。

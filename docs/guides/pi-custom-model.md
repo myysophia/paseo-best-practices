@@ -167,9 +167,9 @@ macOS 系统代理（127.0.0.1:7897）CONNECT 隧道能建立，但 `SSL_ERROR_S
 
 ## 六、与 Paseo 其他文档的关系
 
-- Pi 在 Paseo 下的进程模型、extension 生态（pi-mcp-adapter / pi-web-access 等）见 [PASEO_ARCHITECTURE.md](./PASEO_ARCHITECTURE.md)
-- daemon 环境继承（apiKey 的 `!command` 为何要关注 PATH）见 [PASEO_ARCHITECTURE.md](./PASEO_ARCHITECTURE.md) 环境继承章节
-- auto 模式模型白名单（模型 id 与权限模式的校验关系）见 [PASEO_ADR.md ADR-0007](./PASEO_ADR.md)
+- Pi 在 Paseo 下的进程模型、extension 生态（pi-mcp-adapter / pi-web-access 等）见 [architecture.md](../internals/architecture.md)
+- daemon 环境继承（apiKey 的 `!command` 为何要关注 PATH）见 [architecture.md](../internals/architecture.md) 环境继承章节
+- auto 模式模型白名单（模型 id 与权限模式的校验关系）见 [adr.md ADR-0007](../adr/adr.md)
 
 ---
 

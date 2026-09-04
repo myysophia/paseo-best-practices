@@ -1,6 +1,6 @@
 # Paseo macOS 桌面版运维手册
 
-> 本文专门覆盖 **macOS 桌面 App（`/Applications/Paseo.app`）** 场景。如果你在 Linux 服务器上跑 `paseo daemon`，请看 [PASEO_OPS.md](./PASEO_OPS.md)。
+> 本文专门覆盖 **macOS 桌面 App（`/Applications/Paseo.app`）** 场景。如果你在 Linux 服务器上跑 `paseo daemon`，请看 [linux-ops.md](../ops/linux-ops.md)。
 
 桌面版和服务器版是**两种完全不同的部署形态**，很多在 Linux 上是常识的东西，在桌面版上不成立。先把差异讲清楚，再给配置与排查指南。
 
@@ -17,7 +17,7 @@
 | 配置文件 | `~/.paseo/config.json`（同服务器版） | 同左 |
 | Home 目录 | 默认 `~/.paseo`，可用 `PASEO_HOME` 覆盖 | 同左 |
 | 重启方式 | 退出 App + 重新打开 / `open -a Paseo` | `systemctl restart paseo` |
-| 密码 | 一般不需要（loopback） | 强制必设（见 [OPS 坑 #4](./PASEO_OPS.md)） |
+| 密码 | 一般不需要（loopback） | 强制必设（见 [OPS 坑 #4](../ops/linux-ops.md)） |
 | 远程连接 | 通过 `relay` 中转（`relay.enabled: true`） | 直连 + relay 兜底 |
 
 **关键事实**：桌面版没有独立 daemon，它就是 App 内部的一个 worker。App 退了，daemon 就没了（除非有僵尸 worker，见 [坑 #2](#坑-2--app-退出后-worker-变僵尸占端口)）。
@@ -202,7 +202,7 @@ print('config.modeId=', d.get('config',{}).get('modeId'))
 "
 ```
 
-**修复路径**（两层配合，详见 [ADR-0007](./PASEO_ADR.md)）：
+**修复路径**（两层配合，详见 [ADR-0007](../adr/adr.md)）：
 1. **中转层**：把你 Claude API 代理的 `claude-sonnet-4` alias 到 `claude-sonnet-4-6`。
 2. **Paseo 端**：用 `update_agent({ agentId, settings: { model: "claude-sonnet-4-6" } })` 改 agent model，再切 `auto`。新建 agent 用 `provider: "claude/sonnet"`，让 Paseo 自动解析到当前一代，不要硬写 model 字符串。
 
@@ -232,9 +232,9 @@ print('config.modeId=', d.get('config',{}).get('modeId'))
 
 | 如果你在找…… | 去看 |
 |---|---|
-| 三层进程模型 / relay 拓扑 | [ARCHITECTURE](./PASEO_ARCHITECTURE.md) |
-| 手机连不上（链路 vs 模型）排查 | [OPS 坑 #6](./PASEO_OPS.md) |
-| 改端口 / 开公网 / 设密码的安全顺序 | [OPS 坑 #4](./PASEO_OPS.md) |
-| `IS_SANDBOX=1` 的环境继承问题 | [OPS 坑 #1](./PASEO_OPS.md)（桌面版几乎不会遇到，因为不用 root） |
-| `auto` 模式模型白名单 / alias 方案 | [坑 #4](#坑-4--运行中切-auto-报-auto-mode-unavailable-for-this-model) + [ADR-0007](./PASEO_ADR.md) |
+| 三层进程模型 / relay 拓扑 | [ARCHITECTURE](../internals/architecture.md) |
+| 手机连不上（链路 vs 模型）排查 | [OPS 坑 #6](../ops/linux-ops.md) |
+| 改端口 / 开公网 / 设密码的安全顺序 | [OPS 坑 #4](../ops/linux-ops.md) |
+| `IS_SANDBOX=1` 的环境继承问题 | [OPS 坑 #1](../ops/linux-ops.md)（桌面版几乎不会遇到，因为不用 root） |
+| `auto` 模式模型白名单 / alias 方案 | [坑 #4](#坑-4--运行中切-auto-报-auto-mode-unavailable-for-this-model) + [ADR-0007](../adr/adr.md) |
 | 语音 / 听写的 provider 配置 | https://paseo.sh/docs/configuration → Voice 段 |

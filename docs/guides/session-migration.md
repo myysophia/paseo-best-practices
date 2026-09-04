@@ -178,6 +178,6 @@ paseo send <agent-id> "<下一条任务>"
 
 相关文档：
 
-- [PASEO_USAGE.md](./PASEO_USAGE.md)：常用 CLI 与用户侧操作；
-- [PASEO_ARCHITECTURE.md](./PASEO_ARCHITECTURE.md)：daemon、agent 和 provider 的架构关系；
-- [PASEO_OPS.md](./PASEO_OPS.md)：daemon、systemd、端口和连接故障排查。
+- [usage.md](../getting-started/usage.md)：常用 CLI 与用户侧操作；
+- [architecture.md](../internals/architecture.md)：daemon、agent 和 provider 的架构关系；
+- [linux-ops.md](../ops/linux-ops.md)：daemon、systemd、端口和连接故障排查。

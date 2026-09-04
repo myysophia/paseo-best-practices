@@ -2,7 +2,7 @@
 
 > 这是一份独立的 Tailscale 科普文档,讲清楚它**是什么、怎么工作、解决什么具体问题、怎么用、怎么收费、最佳实践**。和 paseo 文档并列;最后一节用 paseo + Tailscale 的真实部署作为综合案例。
 >
-> 配套阅读:[`PASEO_DIRECT_CONNECT.md`](./PASEO_DIRECT_CONNECT.md)(paseo 直连安全分析)、[`PASEO_ADR.md`](./PASEO_ADR.md) ADR-0006(paseo 用 Tailscale 的决策)。
+> 配套阅读:[`direct-connect.md`](../guides/direct-connect.md)(paseo 直连安全分析)、[`adr.md`](../adr/adr.md) ADR-0006(paseo 用 Tailscale 的决策)。
 
 ---
 
@@ -311,7 +311,7 @@ Tailscale 不是传统 VPN(不用于"翻墙看流媒体"),是**给团队/个人�
 
 ### 问题(为什么要用 Tailscale)
 
-paseo daemon 默认监听 `0.0.0.0:8767` + 密码认证。实测抓包验证(见 [`PASEO_DIRECT_CONNECT.md`](./PASEO_DIRECT_CONNECT.md) §二):**所有 API 流量在公网线缆上全明文**——你发给 agent 的任务、agent 跑的 shell 命令、工作目录、`Authorization` 头,都能被同网段或路径上的攻击者嗅探。密码只防"未授权访问",不防"窃听"。
+paseo daemon 默认监听 `0.0.0.0:8767` + 密码认证。实测抓包验证(见 [`direct-connect.md`](../guides/direct-connect.md) §二):**所有 API 流量在公网线缆上全明文**——你发给 agent 的任务、agent 跑的 shell 命令、工作目录、`Authorization` 头,都能被同网段或路径上的攻击者嗅探。密码只防"未授权访问",不防"窃听"。
 
 ### 方案(怎么用 Tailscale 解决)
 
@@ -330,7 +330,7 @@ paseo daemon 默认监听 `0.0.0.0:8767` + 密码认证。实测抓包验证(见
 
 ### 关键决策与权衡(对应 ADR-0006)
 
-见 [`PASEO_ADR.md`](./PASEO_ADR.md) ADR-0006。核心约束:
+见 [`adr.md`](../adr/adr.md) ADR-0006。核心约束:
 
 - **SG 不能误开 `0.0.0.0/0`**——否则 daemon 全网暴露。
 - **手机必须填 tailnet IP**——填了公网 IP 就退化成明文。
@@ -368,6 +368,6 @@ paseo daemon 默认监听 `0.0.0.0:8767` + 密码认证。实测抓包验证(见
 
 ### 本仓库相关文档
 
-- [`PASEO_DIRECT_CONNECT.md`](./PASEO_DIRECT_CONNECT.md) —— paseo 直连的明文风险分析(抓包证据)
-- [`PASEO_ADR.md`](./PASEO_ADR.md) ADR-0005 / ADR-0006 —— 切到 Tailscale 的决策与双入口权衡
-- [`PASEO_OPS.md`](./PASEO_OPS.md) —— paseo 运维(含 Tailscale 相关坑)
+- [`direct-connect.md`](../guides/direct-connect.md) —— paseo 直连的明文风险分析(抓包证据)
+- [`adr.md`](../adr/adr.md) ADR-0005 / ADR-0006 —— 切到 Tailscale 的决策与双入口权衡
+- [`linux-ops.md`](../ops/linux-ops.md) —— paseo 运维(含 Tailscale 相关坑)

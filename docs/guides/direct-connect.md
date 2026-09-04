@@ -1,7 +1,7 @@
 # Paseo 直连(Direct Connect)最佳实践
 
 > 「添加主机」时选 Direct connect 该怎么配、为什么、风险是什么。
-> 配套阅读:[`PASEO_OPS.md`](./PASEO_OPS.md)(端口/密码/防火墙操作)、[`PASEO_USAGE.md`](./PASEO_USAGE.md)(CLI 用法)。
+> 配套阅读:[`linux-ops.md`](../ops/linux-ops.md)(端口/密码/防火墙操作)、[`usage.md`](../getting-started/usage.md)(CLI 用法)。
 
 ---
 
@@ -217,7 +217,7 @@ remoteAddress: 100.96.58.54
 - 手机配 host 时**必须填 tailnet IP**(`100.x.y.z`),填了公网 IP 就退化成明文。
 - 办公网段内若担心嗅探,设备也可改装 Tailscale 走 tailnet。
 
-详见 [ADR-0006](./PASEO_ADR.md)。这是当前部署采用的模式。
+详见 [ADR-0006](../adr/adr.md)。这是当前部署采用的模式。
 
 ---
 

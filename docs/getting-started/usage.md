@@ -1,7 +1,7 @@
 # Paseo 使用手册
 
 > 面向**使用者**（手机端 / web UI 端用户）。怎么连、怎么发任务、怎么管 agent。
-> 历史会话迁移看 [`PASEO_SESSION_MIGRATION.md`](./PASEO_SESSION_MIGRATION.md)，运维和踩坑看 [`PASEO_OPS.md`](./PASEO_OPS.md)，原理看 [`PASEO_ARCHITECTURE.md`](./PASEO_ARCHITECTURE.md)。
+> 历史会话迁移看 [`session-migration.md`](../guides/session-migration.md)，运维和踩坑看 [`linux-ops.md`](../ops/linux-ops.md)，原理看 [`architecture.md`](../internals/architecture.md)。
 
 ---
 
@@ -76,7 +76,7 @@ paseo clone <github-repo>       # 克隆 repo 并注册为 paseo workspace
 paseo import <id>               # 把已有 provider session 导入为 paseo agent
 ```
 
-> `paseo import` 不等于可以批量导入。迁移历史 Codex / Claude 会话前，先阅读[会话迁移最佳实践](./PASEO_SESSION_MIGRATION.md)：先盘点和检查重复，再逐条导入并用 `paseo inspect` 验证。
+> `paseo import` 不等于可以批量导入。迁移历史 Codex / Claude 会话前，先阅读[会话迁移最佳实践](../guides/session-migration.md)：先盘点和检查重复，再逐条导入并用 `paseo inspect` 验证。
 
 ---
 
@@ -102,14 +102,14 @@ paseo ls --no-headers           # 去掉表头
    ```
 2. **看密码对不对**：CLI 报 `requires a password` / web UI 一直 401 = 密码错或 `PASEO_PASSWORD` 没设。
 3. **看云防火墙/安全组**：确认对应端口的入站规则已放行（具体命令依云厂商而定）。
-4. **更深入的链路/模型排查**：见 [`PASEO_OPS.md` 坑 #7](./PASEO_OPS.md)。
+4. **更深入的链路/模型排查**：见 [`linux-ops.md` 坑 #7](../ops/linux-ops.md)。
 
-国内手机移动数据下抖动是地理决定的（GFW + 太平洋），不是配置问题——见 [OPS 坑 #8](./PASEO_OPS.md)。
+国内手机移动数据下抖动是地理决定的（GFW + 太平洋），不是配置问题——见 [OPS 坑 #8](../ops/linux-ops.md)。
 
 ---
 
 ## 七、不要做的事
 
-- **别手动 `paseo daemon start`**：这台机器已交给 systemd，手动起会丢 `IS_SANDBOX=1` 环境变量，手机端 claude 会报 root 拦截。统一走 `systemctl {start,stop,restart} paseo`。详见 [OPS 坑 #3](./PASEO_OPS.md)。
+- **别手动 `paseo daemon start`**：这台机器已交给 systemd，手动起会丢 `IS_SANDBOX=1` 环境变量，手机端 claude 会报 root 拦截。统一走 `systemctl {start,stop,restart} paseo`。详见 [OPS 坑 #3](../ops/linux-ops.md)。
 - **别把 8767 暴露成无密码**：daemon 派生的 claude 是 root 身份，谁拿到这个端口就等于拿到 root shell。密码必须强。
-- **别改端口忘了同步防火墙**：云防火墙/安全组按端口匹配，daemon 换端口必须同步改入站规则（见 [OPS 坑 #4](./PASEO_OPS.md)）。
+- **别改端口忘了同步防火墙**：云防火墙/安全组按端口匹配，daemon 换端口必须同步改入站规则（见 [OPS 坑 #4](../ops/linux-ops.md)）。
