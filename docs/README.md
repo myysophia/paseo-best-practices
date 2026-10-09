@@ -25,6 +25,7 @@
 | [**skills.md**](./guides/skills.md) | **Orchestration skills 安装与最佳实践** —— 安装状态、验证、handoff/loop/committee/advisor 使用规范 | 使用 Paseo 编排能力的人 |
 | [**pi-custom-model.md**](./guides/pi-custom-model.md) | **Pi 自定义模型配置** —— 中转站接入多厂商模型、models.json 字段详解、SOP、5 个坑 | 用 Pi provider + 中转/自定义模型的人 |
 | [**browser-agent-comparison.md**](./guides/browser-agent-comparison.md) | **浏览器/GUI Agent 方案对比** —— BrowserSkill · Computer Use · Midscene 三方原理、登录态复用机制、选型决策清单 | 给 Agent/测试工程挑选浏览器自动化方案的人 |
+| [**codex-multi-channel.md**](./guides/codex-multi-channel.md) | **Codex 多通道认证与路由** —— CLI / ChatGPT 客户端 / Paseo 三者配置关系、env 注入并存机制、双通道接入 SOP、5 个坑 | 同时用 ChatGPT 订阅 + 中转站/API 的人 |
 
 ### ops —— 运维手册
 

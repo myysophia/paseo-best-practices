@@ -12,7 +12,7 @@ Paseo 让你从手机驱动服务器上的 AI coding agent（claude / codex 等�
 |---|---|
 | [docs/getting-started/](./docs/getting-started/) | 入门与使用：[学习指南](./docs/getting-started/learning.md)、[使用手册](./docs/getting-started/usage.md) |
 | [docs/ops/](./docs/ops/) | 运维手册：[Linux 运维+踩坑](./docs/ops/linux-ops.md)、[macOS 桌面版](./docs/ops/macos-desktop.md) |
-| [docs/guides/](./docs/guides/) | 专项实践：[会话迁移](./docs/guides/session-migration.md)、[直连安全](./docs/guides/direct-connect.md)、[Tailscale](./docs/guides/tailscale.md)、[Skills 编排](./docs/guides/skills.md)、[Pi 自定义模型](./docs/guides/pi-custom-model.md) |
+| [docs/guides/](./docs/guides/) | 专项实践：[会话迁移](./docs/guides/session-migration.md)、[直连安全](./docs/guides/direct-connect.md)、[Tailscale](./docs/guides/tailscale.md)、[Skills 编排](./docs/guides/skills.md)、[Pi 自定义模型](./docs/guides/pi-custom-model.md)、[Codex 多通道认证](./docs/guides/codex-multi-channel.md) |
 | [docs/internals/](./docs/internals/) | 原理深入：[架构](./docs/internals/architecture.md)、[跨 Provider 机制](./docs/internals/cross-provider.md) |
 | [docs/adr/](./docs/adr/) | 决策记录（ADR）：不可逆决策的背景 / 选项 / 代价 |
 
